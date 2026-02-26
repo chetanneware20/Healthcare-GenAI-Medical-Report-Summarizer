@@ -1,59 +1,72 @@
 import streamlit as st
-from transformers import pipeline
-import PyPDF2
+import pandas as pd
+from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM
 
 # Page config
 st.set_page_config(
-    page_title="Healthcare GenAI – Medical Report Summarizer",
+    page_title="Healthcare GenAI – Patient Summary",
     page_icon="🧠",
     layout="centered"
 )
 
-st.title("🧠 Healthcare GenAI – Medical Report Summarizer")
-st.write("Upload a medical report and get an AI-generated summary.")
-st.caption("⚠️ This tool is for educational purposes only and not medical advice.")
+st.title("🧠 Healthcare GenAI – Patient Summary Generator")
+st.caption("⚠️ Educational use only. Not medical advice.")
 
-# Load summarization model
+# Load model safely (Streamlit Cloud compatible)
 @st.cache_resource
 def load_model():
-    return pipeline(
-        "summarization",
-        model="facebook/bart-large-cnn"
-    )
+    tokenizer = AutoTokenizer.from_pretrained("facebook/bart-large-cnn")
+    model = AutoModelForSeq2SeqLM.from_pretrained("facebook/bart-large-cnn")
+    return pipeline("summarization", model=model, tokenizer=tokenizer)
 
 summarizer = load_model()
 
-# File upload
-uploaded_file = st.file_uploader(
-    "Upload Medical Report (PDF or TXT)",
-    type=["pdf", "txt"]
+# Load CSV
+@st.cache_data
+def load_data():
+    return pd.read_csv("sample_report.csv")
+
+df = load_data()
+
+st.subheader("📊 Patient Records")
+st.dataframe(df, use_container_width=True)
+
+# Select patient
+patient_id = st.selectbox(
+    "Select Patient ID",
+    df["patient_id"].unique()
 )
 
-def extract_text(file):
-    if file.type == "application/pdf":
-        reader = PyPDF2.PdfReader(file)
-        text = ""
-        for page in reader.pages:
-            text += page.extract_text()
-        return text
-    else:
-        return file.read().decode("utf-8")
+patient = df[df["patient_id"] == patient_id].iloc[0]
 
-if uploaded_file:
-    report_text = extract_text(uploaded_file)
+# Convert row → clinical text
+clinical_text = f"""
+Patient Name: {patient['name']}
+Age: {patient['age']}
+Gender: {patient['gender']}
+Diagnosis: {patient['diagnosis']}
+Symptoms: {patient['symptoms']}
+HbA1c: {patient['hba1c']}
+Blood Pressure: {patient['blood_pressure']}
+Fasting Glucose: {patient['fasting_glucose']}
+Medication: {patient['medication']}
+Follow-up in weeks: {patient['follow_up_weeks']}
+Clinical Notes: {patient['notes']}
+"""
 
-    st.subheader("📄 Extracted Report Text")
-    with st.expander("View Report"):
-        st.write(report_text)
+st.subheader("📄 Clinical Input Text")
+with st.expander("View Generated Clinical Text"):
+    st.write(clinical_text)
 
-    if st.button("🧠 Generate Summary"):
-        with st.spinner("Summarizing report..."):
-            summary = summarizer(
-                report_text,
-                max_length=150,
-                min_length=50,
-                do_sample=False
-            )
+# Summarize
+if st.button("🧠 Generate AI Summary"):
+    with st.spinner("Generating summary..."):
+        summary = summarizer(
+            clinical_text,
+            max_length=120,
+            min_length=50,
+            do_sample=False
+        )
 
-        st.subheader("📝 AI Generated Summary")
-        st.success(summary[0]["summary_text"])
+    st.subheader("📝 AI Generated Summary")
+    st.success(summary[0]["summary_text"])
