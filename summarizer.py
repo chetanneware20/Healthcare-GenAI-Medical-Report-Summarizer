@@ -19,7 +19,19 @@ def summarize_patient(row, api_key, retries=3):
     Fasting Glucose: {row['fasting_glucose']}
     Medication: {row['medication']}
     Notes: {row['notes']}
+def fallback_summary(row):
+    summary = []
 
+    if row["hba1c"] > 6.5:
+        summary.append("Blood sugar levels appear higher than the normal range.")
+
+    if row["fasting_glucose"] > 126:
+        summary.append("Fasting glucose value is elevated.")
+
+    if not summary:
+        summary.append("No major abnormal values are detected in the report.")
+
+    return " ".join(summary)
     Task:
     - Summarize in simple, patient-friendly language
     - Highlight abnormal values
