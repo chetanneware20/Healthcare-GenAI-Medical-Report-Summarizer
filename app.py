@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
-from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM
+import torch
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 # Page config
 st.set_page_config(
@@ -12,14 +13,15 @@ st.set_page_config(
 st.title("🧠 Healthcare GenAI – Patient Summary Generator")
 st.caption("⚠️ Educational use only. Not medical advice.")
 
-# Load model safely (Streamlit Cloud compatible)
+# Load model safely (NO pipeline)
 @st.cache_resource
 def load_model():
     tokenizer = AutoTokenizer.from_pretrained("facebook/bart-large-cnn")
     model = AutoModelForSeq2SeqLM.from_pretrained("facebook/bart-large-cnn")
-    return pipeline("summarization", model=model, tokenizer=tokenizer)
+    model.eval()
+    return tokenizer, model
 
-summarizer = load_model()
+tokenizer, model = load_model()
 
 # Load CSV
 @st.cache_data
@@ -39,7 +41,7 @@ patient_id = st.selectbox(
 
 patient = df[df["patient_id"] == patient_id].iloc[0]
 
-# Convert row → clinical text
+# Convert structured row → clinical text
 clinical_text = f"""
 Patient Name: {patient['name']}
 Age: {patient['age']}
@@ -58,15 +60,29 @@ st.subheader("📄 Clinical Input Text")
 with st.expander("View Generated Clinical Text"):
     st.write(clinical_text)
 
-# Summarize
+# Summarize using model.generate()
 if st.button("🧠 Generate AI Summary"):
     with st.spinner("Generating summary..."):
-        summary = summarizer(
+        inputs = tokenizer(
             clinical_text,
-            max_length=120,
-            min_length=50,
-            do_sample=False
+            return_tensors="pt",
+            truncation=True,
+            max_length=1024
+        )
+
+        with torch.no_grad():
+            summary_ids = model.generate(
+                inputs["input_ids"],
+                max_length=150,
+                min_length=60,
+                num_beams=4,
+                early_stopping=True
+            )
+
+        summary = tokenizer.decode(
+            summary_ids[0],
+            skip_special_tokens=True
         )
 
     st.subheader("📝 AI Generated Summary")
-    st.success(summary[0]["summary_text"])
+    st.success(summary)
