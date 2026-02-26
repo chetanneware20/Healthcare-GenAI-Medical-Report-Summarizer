@@ -1,5 +1,15 @@
-def summarize_patient(row, client):
+import google.generativeai as genai
+import time
+
+def summarize_patient(row, api_key, retries=3):
+    genai.configure(api_key=api_key)
+
+    model = genai.GenerativeModel("gemini-1.5-flash")
+
     prompt = f"""
+    You are a medical report summarization assistant.
+
+    Patient Details:
     Age: {row['age']}
     Gender: {row['gender']}
     Diagnosis: {row['diagnosis']}
@@ -10,18 +20,18 @@ def summarize_patient(row, client):
     Medication: {row['medication']}
     Notes: {row['notes']}
 
-    Summarize in simple language.
-    Do NOT give medical advice.
-    Highlight abnormal values.
+    Task:
+    - Summarize in simple, patient-friendly language
+    - Highlight abnormal values
+    - Do NOT give medical advice
+    - Do NOT change diagnosis
     """
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": "You are a safe medical summarizer."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.3
-    )
+    for attempt in range(retries):
+        try:
+            response = model.generate_content(prompt)
+            return response.text
+        except Exception:
+            time.sleep(2 ** attempt)
 
-    return response.choices[0].message.content
+    return "⚠️ Unable to generate summary at the moment. Please try again."
