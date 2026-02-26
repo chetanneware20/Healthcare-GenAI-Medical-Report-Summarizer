@@ -1,22 +1,25 @@
-# Healthcare-GenAI-Medical-Report-Summarizer
+# 🏥 AI Medical Report Analyzer – Healthcare GenAI Project
 
-# 🧠 Healthcare GenAI – Medical Report Summarizer
-
-This project uses Generative AI to summarize medical reports and extract key insights for faster understanding.
+## 📌 Overview
+This project is a Generative AI–powered healthcare application that analyzes
+medical report data from CSV files and provides patient-friendly explanations.
 
 ## 🚀 Features
-- Upload PDF or text medical reports
-- AI-generated concise summary
-- Simple and clean Streamlit UI
-- Educational & non-diagnostic tool
+- Upload medical report CSV
+- Automatic data visualization
+- AI-generated explanations of lab results
+- Abnormal value highlighting
+- Streamlit-based interactive UI
 
 ## 🛠 Tech Stack
 - Python
+- Pandas
 - Streamlit
-- Hugging Face Transformers
-- BART Large CNN model
+- OpenAI API
+- Prompt Engineering
 
-## ▶️ How to Run
-```bash
-pip install -r requirements.txt
-streamlit run app.py
+## ⚠️ Disclaimer
+This tool is for educational purposes only and does not provide medical diagnosis or treatment.
+
+## 🌐 Deployment
+Deployed on Streamlit Cloud
