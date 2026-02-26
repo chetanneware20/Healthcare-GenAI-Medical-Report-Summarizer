@@ -1,0 +1,11 @@
+patient_id,name,age,gender,diagnosis,symptoms,hba1c,blood_pressure,fasting_glucose,medication,follow_up_weeks,notes
+P001,Rahul Sharma,52,Male,Type 2 Diabetes,"Fatigue, frequent urination, thirst",8.9,"150/95",182,"Metformin; Glimepiride",8,"Lifestyle modification advised"
+P002,Anita Verma,45,Female,Hypertension,"Headache, dizziness",6.2,"160/100",110,"Amlodipine",6,"Salt restriction recommended"
+P003,Suresh Patil,60,Male,Coronary Artery Disease,"Chest pain, shortness of breath",6.8,"140/90",118,"Aspirin; Atorvastatin",4,"ECG monitoring required"
+P004,Pooja Mehta,34,Female,Hypothyroidism,"Weight gain, fatigue",5.9,"120/80",95,"Levothyroxine",12,"TSH follow-up advised"
+P005,Amit Kulkarni,28,Male,Asthma,"Wheezing, breathlessness",5.4,"118/76",92,"Salbutamol Inhaler",4,"Avoid allergens"
+P006,Neha Joshi,50,Female,Type 2 Diabetes,"Blurred vision, fatigue",8.1,"145/92",170,"Metformin",8,"Diet control emphasized"
+P007,Rajesh Nair,65,Male,Chronic Kidney Disease,"Swelling, decreased urine output",7.0,"155/98",160,"ACE Inhibitors",6,"Renal function monitoring"
+P008,Kavita Rao,40,Female,Anemia,"Fatigue, pallor",5.6,"110/70",88,"Iron Supplements",10,"Hemoglobin recheck"
+P009,Manoj Deshpande,55,Male,Hyperlipidemia,"No major symptoms",6.0,"130/85",105,"Statins",12,"Diet and exercise advised"
+P010,Sunita Iyer,48,Female,Migraine,"Severe headache, nausea",5.7,"125/82",98,"Sumatriptan",6,"Trigger avoidance suggested"
