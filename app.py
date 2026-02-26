@@ -1,18 +1,24 @@
 import streamlit as st
-from summarizer import summarize_report
+import pandas as pd
 from openai import OpenAI
-import streamlit as st
+from summarizer import summarize_patient
 
+st.set_page_config(page_title="Healthcare GenAI", page_icon="🏥")
+
+# ✅ Access secrets ONLY here
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-st.set_page_config(page_title="Medical Report Summarizer 🏥")
 
-st.title("🏥 GenAI Medical Report Summarizer")
+st.title("🏥 Healthcare GenAI – Medical Report Summarizer")
 
-uploaded_file = st.file_uploader("Upload Medical Report", type=["txt", "pdf"])
+uploaded_file = st.file_uploader("Upload CSV", type=["csv"])
 
 if uploaded_file:
-    text = uploaded_file.read().decode("utf-8")
+    df = pd.read_csv(uploaded_file)
+    st.dataframe(df)
+
+    patient_id = st.selectbox("Select Patient", df["patient_id"])
+
     if st.button("Generate Summary"):
-        summary = summarize_report(text)
-        st.success("Summary Generated")
-        st.write(summary)
+        row = df[df["patient_id"] == patient_id].iloc[0]
+        summary = summarize_patient(row, client)
+        st.success(summary)
