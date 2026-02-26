@@ -1,6 +1,9 @@
 import streamlit as st
 from summarizer import summarize_report
+from openai import OpenAI
+import streamlit as st
 
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 st.set_page_config(page_title="Medical Report Summarizer 🏥")
 
 st.title("🏥 GenAI Medical Report Summarizer")
